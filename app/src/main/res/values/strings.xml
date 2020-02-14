@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">FinAnalysis</string>
+    <string name="fin">Финансы</string>
+    <string name="analitic">Аналитика</string>
+</resources>
