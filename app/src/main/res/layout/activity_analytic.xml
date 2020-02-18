@@ -23,28 +23,28 @@
             android:layout_marginBottom="10dp"
             android:gravity="center" />
 
-        <Button
-            android:id="@+id/button"
-            android:onClick="onStatButtonClick"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#82393948"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:textColor="#FFFFFF"
-            android:text="Анализ"
-            android:textSize="24sp" />
-
         <ListView
             android:id="@+id/listView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:cacheColorHint="#00FFFFFF"
+            android:layout_height="586dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp">
+            android:cacheColorHint="#00FFFFFF">
 
         </ListView>
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#82393948"
+            android:onClick="onStatButtonClick"
+            android:text="Анализ"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp" />
 
     </LinearLayout>
 

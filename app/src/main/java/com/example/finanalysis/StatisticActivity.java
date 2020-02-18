@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -176,6 +177,50 @@ public class StatisticActivity extends AppCompatActivity  {
             imageView.setImageBitmap(bitmap);
 
             textView1.setText("Расходы");
+        } catch (Exception e) { textView1.setText("Error"); }
+    }
+
+    // Диаграмма расходов
+    public void onBtn_DigrammExpence(View view)
+    {
+        try {
+
+            Bitmap bitmap = Bitmap.createBitmap(imageView.getWidth(), imageView.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            canvas.drawColor(Color.BLACK);
+
+            // Диаграмма расходов
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setStrokeWidth(10);
+            paint.setColor(0xFF3B9900);
+            Path path = new Path();
+
+            float[] aaa = {1,1,2};
+
+            final RectF oval = new RectF();
+            float center_x, center_y;
+            center_x = canvas.getWidth()/2;
+            center_y = canvas.getHeight()/2;
+            float radius = 300f;
+
+            float delta = 0; // Минимальная единица зарисовки
+            for (int i=0; i<3;i++) delta +=aaa[i];
+            delta = 360/delta;
+
+            float last_point = 0; // Конец последнего края отрисовоной части
+
+            // Рисуем диаграмму расходов
+            for (int i=0; i<3;i++) {
+                oval.set(center_x - radius, center_y - radius, center_x + radius,
+                        center_y + radius);
+                paint.setColor(0xFF3B9900*(i+1));
+                canvas.drawArc(oval, last_point, aaa[i]*delta, true, paint);
+                last_point += aaa[i]*delta;
+            }
+
+            imageView.setImageBitmap(bitmap);
+
+            textView1.setText("Диаграмма расходов");
         } catch (Exception e) { textView1.setText("Error"); }
     }
 }
