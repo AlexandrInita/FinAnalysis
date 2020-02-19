@@ -4,13 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/background_dark"
+    android:background="#121212"
     tools:context=".StatisticActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#A02A2A37"
         android:orientation="vertical">
 
         <TextView
@@ -31,7 +30,8 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
-            app:srcCompat="@android:color/black" />
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/graphview"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -45,10 +45,12 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="5dp"
                 android:layout_weight="1"
-                android:background="#82393948"
+                android:background="@drawable/cool_button"
                 android:onClick="onBtn_balance"
                 android:text="Баланс"
                 android:textColor="#FFFFFF"
+                android:textCursorDrawable="@android:color/background_light"
+                android:textIsSelectable="false"
                 android:textSize="24sp" />
 
             <Button
@@ -58,7 +60,7 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
-                android:background="#82393948"
+                android:background="@drawable/cool_button"
                 android:onClick="onBtn_Expence"
                 android:text="Расходы"
                 android:textColor="#FFFFFF"
@@ -73,7 +75,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:background="#82393948"
+            android:background="@drawable/cool_button"
             android:onClick="onBtn_DigrammExpence"
             android:text="Диаграмма расходов"
             android:textColor="#FFFFFF"
@@ -83,7 +85,7 @@
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Расходы в месяц"
+            android:text="Средний чек"
             android:layout_marginTop="10dp"
             android:gravity="center"
             android:textColor="#FFFFFF"
@@ -93,11 +95,10 @@
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="0"
             android:layout_marginTop="10dp"
             android:gravity="center"
             android:textColor="#FFFFFF"
-            android:textSize="30sp"/>
+            android:textSize="30sp" />
 
     </LinearLayout>
 

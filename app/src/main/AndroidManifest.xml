@@ -23,10 +23,11 @@
         </activity>
         <activity
             android:name=".AnalyticActivity"
-            android:label="@string/fin"></activity>
+            android:label="@string/fin" />
         <activity
             android:name=".StatisticActivity"
-            android:label="@string/analitic"></activity>
+            android:label="@string/analitic" />
+        <activity android:name=".ExpenseDiagramActivity"
+            android:label="@string/analitic"/>
     </application>
-
 </manifest>

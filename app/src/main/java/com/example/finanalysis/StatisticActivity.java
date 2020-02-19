@@ -2,12 +2,16 @@ package com.example.finanalysis;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -20,11 +24,12 @@ import java.util.ArrayList;
 public class StatisticActivity extends AppCompatActivity  {
 
     TextView textView1;
-    TextView textView3;
+    TextView textView2;
     ImageView imageView; // График
 
     double[] balance_arr = new double[1000]; // Массив доходов и расходов
     String[] balance_data = new String[1000]; // Массив дат доходов и расходов
+    String[] about_arr = new String[1000]; // Массив описания расходов
     int balance_i; // Длина массива баланса
 
     @Override
@@ -37,27 +42,55 @@ public class StatisticActivity extends AppCompatActivity  {
         if(arguments!=null){
             balance_arr = arguments.getDoubleArray("balance_arr");
             balance_data = arguments.getStringArray("balance_data");
+            about_arr = arguments.getStringArray("about_arr");
             balance_i = arguments.getInt("balance_i");
         }
 
-        textView1 = findViewById(R.id.textView);
-        textView3 = findViewById(R.id.textView3);
-        imageView = findViewById(R.id.imageView);
+        textView1 = findViewById(R.id.textView); // Текст "График"
+        textView2 = findViewById(R.id.textView2); // Текст среднего чека
+        imageView = findViewById(R.id.imageView); // График
 
-        double mian_expence = 0;
-        double n_expence = 0;
+        double mian_expence = 0; // Средний чек
+        double n_expence = 0; // Количество расходов
+        double sigma = 0; // Среднеквадротическое отклонение
+        double mian = 0;
 
+        // Подсчет среднего чека с выбросом крайни высоких расходов (свыше трех сигм)
+        // Посчитываем среднее
         for (int i=0; i<balance_i;i++)
         {
             if (balance_arr[i]<0) {
-                mian_expence += balance_arr[i];
+                mian += balance_arr[i];
                 n_expence +=1;
+            }
+        }
+
+        mian /= n_expence;
+
+        //Считаем дисперсию
+        for (int i=0; i<balance_i;i++)
+        {
+            if (balance_arr[i]<0) sigma += (balance_arr[i] - mian) * (balance_arr[i] - mian);
+        }
+
+        sigma /= n_expence; // Дисперсия
+        sigma = Math.sqrt(sigma); // Среднеквадратическое отклонение
+
+        // Подсчитываем средней чек
+        n_expence = 0;
+        for (int i=0; i<balance_i; i++)
+        {
+            if (balance_arr[i] < 0) {
+                if (balance_arr[i] > mian-3*sigma) {
+                    mian_expence += balance_arr[i];
+                    n_expence += 1;
+                }
             }
         }
 
         mian_expence /= n_expence;
 
-        textView3.setText(String.valueOf(mian_expence));
+        textView2.setText(String.format("Средний чек: %.2f", -mian_expence));
     }
 
     // Нажатие кнопки баланс для отрисовки графика баланса
@@ -67,15 +100,28 @@ public class StatisticActivity extends AppCompatActivity  {
 
             Bitmap bitmap = Bitmap.createBitmap(imageView.getWidth(), imageView.getHeight(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
-            canvas.drawColor(Color.BLACK);
+
+            BitmapShader shader;
+            shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+
+            Paint paint = new Paint();
+            paint.setAntiAlias(true);
+            paint.setShader(shader);
+
+            RectF rect = new RectF(0.0f, 0.0f, imageView.getWidth(), imageView.getHeight());
+            canvas.drawRoundRect(rect, 10.0f, 10.0f, paint);
 
             // График извенения баланса
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint = new Paint(Paint.ANTI_ALIAS_FLAG);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(10);
-            paint.setColor(0xFF3B9900);
-            //paint.setShadowLayer(5.0f, 0.0f, 0.0f, 0xFFFFFFFF);
+            paint.setColor(0xFF69F0AE);
             Path path = new Path();
+
+            // Закругляем углы у линии отрисовки
+            float radius = 50.0f;
+            CornerPathEffect cornerPathEffect = new CornerPathEffect(radius);
+            paint.setPathEffect(cornerPathEffect);
 
             double[] balance_arr_0 = new double[balance_i];
             String[] balance_data_0 = new String[balance_i];
@@ -125,20 +171,29 @@ public class StatisticActivity extends AppCompatActivity  {
         } catch (Exception e) { textView1.setText("Error"); }
     }
 
-    // График расходов
+    // Гистограмма расходов
     public void onBtn_Expence(View view)
     {
         try {
 
             Bitmap bitmap = Bitmap.createBitmap(imageView.getWidth(), imageView.getHeight(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
-            canvas.drawColor(Color.BLACK);
+
+            BitmapShader shader;
+            shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+
+            Paint paint = new Paint();
+            paint.setAntiAlias(true);
+            paint.setShader(shader);
+
+            RectF rect = new RectF(0.0f, 0.0f, imageView.getWidth(), imageView.getHeight());
+            canvas.drawRoundRect(rect, 10.0f, 10.0f, paint);
 
             // График извенения баланса
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint = new Paint(Paint.ANTI_ALIAS_FLAG);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(10);
-            paint.setColor(0xFF3B9900);
+            paint.setColor(0xFF69F0AE);
             Path path = new Path();
 
             float[] balance_arr_0 = new float[balance_i];
@@ -183,44 +238,11 @@ public class StatisticActivity extends AppCompatActivity  {
     // Диаграмма расходов
     public void onBtn_DigrammExpence(View view)
     {
-        try {
-
-            Bitmap bitmap = Bitmap.createBitmap(imageView.getWidth(), imageView.getHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-            canvas.drawColor(Color.BLACK);
-
-            // Диаграмма расходов
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            paint.setStrokeWidth(10);
-            paint.setColor(0xFF3B9900);
-            Path path = new Path();
-
-            float[] aaa = {1,1,2};
-
-            final RectF oval = new RectF();
-            float center_x, center_y;
-            center_x = canvas.getWidth()/2;
-            center_y = canvas.getHeight()/2;
-            float radius = 300f;
-
-            float delta = 0; // Минимальная единица зарисовки
-            for (int i=0; i<3;i++) delta +=aaa[i];
-            delta = 360/delta;
-
-            float last_point = 0; // Конец последнего края отрисовоной части
-
-            // Рисуем диаграмму расходов
-            for (int i=0; i<3;i++) {
-                oval.set(center_x - radius, center_y - radius, center_x + radius,
-                        center_y + radius);
-                paint.setColor(0xFF3B9900*(i+1));
-                canvas.drawArc(oval, last_point, aaa[i]*delta, true, paint);
-                last_point += aaa[i]*delta;
-            }
-
-            imageView.setImageBitmap(bitmap);
-
-            textView1.setText("Диаграмма расходов");
-        } catch (Exception e) { textView1.setText("Error"); }
+        Intent i1 = new Intent(this,ExpenseDiagramActivity.class);
+        i1.putExtra("balance_arr", balance_arr);
+        i1.putExtra("balance_data", balance_data);
+        i1.putExtra("about_arr", about_arr);
+        i1.putExtra("balance_i", balance_i);
+        startActivity(i1);
     }
 }

@@ -5,35 +5,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#121212"
-    tools:context=".MainActivity">
+    tools:context=".ExpenseDiagramActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/textView"
+        <ImageView
+            android:id="@+id/imageView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="390dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:text="Добро пожаловать"
-            android:textColor="@android:color/white"
-            android:textSize="36sp" />
+            android:background="@drawable/graphview" />
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/button2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="70dp"
-            android:layout_marginRight="70dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:background="@drawable/cool_button"
-            android:onClick="onAnalButtonClick"
-            android:text="Финансы"
+            android:onClick="onBtn_showDiagram"
+            android:text="Диаграмма"
             android:textColor="#FFFFFF"
             android:textSize="24sp"/>
 
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:color="#FF212121"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"/>
     </LinearLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

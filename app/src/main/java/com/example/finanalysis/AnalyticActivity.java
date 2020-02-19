@@ -408,6 +408,7 @@ public class AnalyticActivity extends AppCompatActivity {
         Intent i1 = new Intent(this,StatisticActivity.class);
         i1.putExtra("balance_arr", balance_arr);
         i1.putExtra("balance_data", balance_data);
+        i1.putExtra("about_arr", about_arr);
         i1.putExtra("balance_i", balance_i);
         startActivity(i1);
     }
