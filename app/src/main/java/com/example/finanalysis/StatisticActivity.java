@@ -27,10 +27,7 @@ public class StatisticActivity extends AppCompatActivity  {
     TextView textView2;
     ImageView imageView; // График
 
-    double[] balance_arr = new double[1000]; // Массив доходов и расходов
-    String[] balance_data = new String[1000]; // Массив дат доходов и расходов
-    String[] about_arr = new String[1000]; // Массив описания расходов
-    int balance_i; // Длина массива баланса
+    ArrayList<Check> checks_array = new ArrayList<>(); // Чеки
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +37,14 @@ public class StatisticActivity extends AppCompatActivity  {
         Bundle arguments = getIntent().getExtras();
 
         if(arguments!=null){
-            balance_arr = arguments.getDoubleArray("balance_arr");
-            balance_data = arguments.getStringArray("balance_data");
-            about_arr = arguments.getStringArray("about_arr");
-            balance_i = arguments.getInt("balance_i");
+            float[] check_ex_rev = arguments.getFloatArray("check_ex_rev");
+            String[] check_date = arguments.getStringArray("check_date");
+            String[] check_about = arguments.getStringArray("check_about");
+
+            for (int i=0; i < check_ex_rev.length; i++) {
+                checks_array.add(new Check(check_about[i],check_ex_rev[i],check_date[i]));
+            }
+
         }
 
         textView1 = findViewById(R.id.textView); // Текст "График"
@@ -57,10 +58,10 @@ public class StatisticActivity extends AppCompatActivity  {
 
         // Подсчет среднего чека с выбросом крайни высоких расходов (свыше трех сигм)
         // Посчитываем среднее
-        for (int i=0; i<balance_i;i++)
+        for (int i=0; i<checks_array.size();i++)
         {
-            if (balance_arr[i]<0) {
-                mian += balance_arr[i];
+            if (checks_array.get(i).getExpense_revenue() < 0) {
+                mian += checks_array.get(i).getExpense_revenue();
                 n_expence +=1;
             }
         }
@@ -68,9 +69,10 @@ public class StatisticActivity extends AppCompatActivity  {
         mian /= n_expence;
 
         //Считаем дисперсию
-        for (int i=0; i<balance_i;i++)
+        for (int i=0; i < checks_array.size();i++)
         {
-            if (balance_arr[i]<0) sigma += (balance_arr[i] - mian) * (balance_arr[i] - mian);
+            if (checks_array.get(i).getExpense_revenue() < 0)
+                sigma += (checks_array.get(i).getExpense_revenue() - mian) * (checks_array.get(i).getExpense_revenue() - mian);
         }
 
         sigma /= n_expence; // Дисперсия
@@ -78,11 +80,11 @@ public class StatisticActivity extends AppCompatActivity  {
 
         // Подсчитываем средней чек
         n_expence = 0;
-        for (int i=0; i<balance_i; i++)
+        for (int i=0; i < checks_array.size(); i++)
         {
-            if (balance_arr[i] < 0) {
-                if (balance_arr[i] > mian-3*sigma) {
-                    mian_expence += balance_arr[i];
+            if (checks_array.get(i).getExpense_revenue() < 0) {
+                if (checks_array.get(i).getExpense_revenue() > mian-3*sigma) {
+                    mian_expence += checks_array.get(i).getExpense_revenue();
                     n_expence += 1;
                 }
             }
@@ -97,17 +99,16 @@ public class StatisticActivity extends AppCompatActivity  {
     public void onBtn_balance(View view)
     {
         try {
-
+            // Для отрисовки графика
             Bitmap bitmap = Bitmap.createBitmap(imageView.getWidth(), imageView.getHeight(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
 
+            // Чтобы сделать края графика округлыми
             BitmapShader shader;
             shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-
             Paint paint = new Paint();
             paint.setAntiAlias(true);
             paint.setShader(shader);
-
             RectF rect = new RectF(0.0f, 0.0f, imageView.getWidth(), imageView.getHeight());
             canvas.drawRoundRect(rect, 10.0f, 10.0f, paint);
 
@@ -123,26 +124,17 @@ public class StatisticActivity extends AppCompatActivity  {
             CornerPathEffect cornerPathEffect = new CornerPathEffect(radius);
             paint.setPathEffect(cornerPathEffect);
 
-            double[] balance_arr_0 = new double[balance_i];
-            String[] balance_data_0 = new String[balance_i];
+            float[] sum_bal = new float[1000];
+            float min_bal = checks_array.get(checks_array.size()-1).getExpense_revenue();
+            float max_bal = checks_array.get(checks_array.size()-1).getExpense_revenue();
 
-            // Меняем местами данные, т.к. в начальном время идет в обратную сторону
-            for (int i=balance_i; i>0; i--)
-            {
-                balance_arr_0[balance_i-i] = balance_arr[i];
-                balance_data_0[balance_i-i] = balance_data[i];
-            }
-
-            double[] sum_bal = new double[1000];
-            double min_bal = balance_arr_0[0];
-            double max_bal = balance_arr_0[0];
-
-            sum_bal[0] = balance_arr_0[0];
+            // Заполнение наоборот, т.к. список был наоборот
+            sum_bal[0] = checks_array.get(checks_array.size()-1).getExpense_revenue();
 
             // Заполнение изменения баланса и поиск минимального и максимального баланса
-            for (int i=1; i<balance_i; i++)
+            for (int i= 1; i < checks_array.size(); i++)
             {
-                sum_bal[i] = sum_bal[i-1] + balance_arr_0[i];
+                sum_bal[i] = sum_bal[i-1] + checks_array.get(checks_array.size()-1-i).getExpense_revenue();
 
                 if (min_bal > sum_bal[i]) min_bal = sum_bal[i];
                 if (max_bal < sum_bal[i]) max_bal = sum_bal[i];
@@ -150,20 +142,15 @@ public class StatisticActivity extends AppCompatActivity  {
 
             //                                 100 - отступ от краев
             float pix_y = (canvas.getHeight()-100) / (float)(max_bal - min_bal); // Определение минимального изменения для отрисовки
-            float pix_x = canvas.getWidth() / (float)(balance_i);
+            float pix_x = canvas.getWidth() / checks_array.size();
 
             path.moveTo(0, 50 + (float)max_bal * pix_y); // Начало отрисовки графика
 
-            for (int i=0; i<balance_i; i++)
+            for (int i=0; i < checks_array.size(); i++)
             {
                 path.lineTo((i+1)*pix_x, 50 + (float)max_bal * pix_y - (float)sum_bal[i]*pix_y);
                 canvas.drawPath(path, paint);
             }
-
-            //Paint paintText = new Paint();
-            //paintText.setColor(Color.BLACK);
-            //paintText.setTextSize(40);
-            //canvas_s.drawText(String.valueOf(pix_y),200,200, paintText);
 
             imageView.setImageBitmap(bitmap);
 
@@ -196,26 +183,18 @@ public class StatisticActivity extends AppCompatActivity  {
             paint.setColor(0xFF69F0AE);
             Path path = new Path();
 
-            float[] balance_arr_0 = new float[balance_i];
-            String[] balance_data_0 = new String[balance_i];
-
-            // Меняем местами данные, т.к. в начальном время идет в обратную сторону
-            for (int i=balance_i; i>0; i--)
-            {
-                balance_arr_0[balance_i-i] = (float) balance_arr[i];
-                balance_data_0[balance_i-i] = balance_data[i];
-            }
-
             float max_ex = 0;
 
             ArrayList<Float> expense_arr = new ArrayList<Float>();
 
             // Поиск максимального расхода
-            for (int i=0; i<balance_i; i++)
+            // Отсчет наоборот
+            for (int i=checks_array.size()-1; i > 0; i--)
             {
-                if (balance_arr_0[i]<0) {
-                    expense_arr.add(balance_arr_0[i]);
-                    if (max_ex > balance_arr_0[i]) max_ex = balance_arr_0[i];
+                if (checks_array.get(i).getExpense_revenue() < 0) {
+                    expense_arr.add(checks_array.get(i).getExpense_revenue());
+                    if (max_ex > checks_array.get(i).getExpense_revenue())
+                        max_ex = checks_array.get(i).getExpense_revenue();
                 }
             }
 
@@ -235,14 +214,23 @@ public class StatisticActivity extends AppCompatActivity  {
         } catch (Exception e) { textView1.setText("Error"); }
     }
 
-    // Диаграмма расходов
+    // Нажатие кнопки диаграмма расходов для перехода на другую активность
     public void onBtn_DigrammExpence(View view)
     {
+        float[] check_ex_rev = new float[checks_array.size()];
+        String[] check_date = new String[checks_array.size()];
+        String[] check_about = new String[checks_array.size()];
+
+        for (int j=0; j < checks_array.size(); j++) {
+            check_ex_rev[j] = checks_array.get(j).getExpense_revenue();
+            check_date[j] = checks_array.get(j).getDate();
+            check_about[j] = checks_array.get(j).getName();
+        }
+
         Intent i1 = new Intent(this,ExpenseDiagramActivity.class);
-        i1.putExtra("balance_arr", balance_arr);
-        i1.putExtra("balance_data", balance_data);
-        i1.putExtra("about_arr", about_arr);
-        i1.putExtra("balance_i", balance_i);
+        i1.putExtra("check_ex_rev", check_ex_rev);
+        i1.putExtra("check_date", check_date);
+        i1.putExtra("check_about", check_about);
         startActivity(i1);
     }
 }

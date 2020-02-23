@@ -14,16 +14,24 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
 
 public class ExpenseDiagramActivity extends AppCompatActivity {
 
-    double[] balance_arr = new double[1000]; // Массив доходов и расходов
-    String[] balance_data = new String[1000]; // Массив дат доходов и расходов
-    String[] about_arr = new String[1000]; // Массив описания расходов
-    int balance_i; // Длина массива баланса
+    HashMap<String,Float> expenseAboutMap; // Категории расходов
 
     ImageView imageView; // Диаграмма
+    ListView listView; // Список расходов
     Button btn;
+
+    ArrayList<Check> checks_array = new ArrayList<>(); // Чеки
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,17 +40,21 @@ public class ExpenseDiagramActivity extends AppCompatActivity {
 
         // Прием значений
         Bundle arguments = getIntent().getExtras();
-        if(arguments!=null){
-            balance_arr = arguments.getDoubleArray("balance_arr");
-            balance_data = arguments.getStringArray("balance_data");
-            about_arr = arguments.getStringArray("about_arr");
-            balance_i = arguments.getInt("balance_i");
+
+        if(arguments!=null) {
+           float[] check_ex_rev = arguments.getFloatArray("check_ex_rev");
+           String[] check_date = arguments.getStringArray("check_date");
+           String[] check_about = arguments.getStringArray("check_about");
+
+            for (int i = 0; i < check_ex_rev.length; i++) {
+                checks_array.add(new Check(check_about[i], check_ex_rev[i], check_date[i]));
+            }
         }
 
         // Инициализация
         imageView = findViewById(R.id.imageView);
         btn = findViewById(R.id.button2);
-        showDiagram();
+        listView = findViewById(R.id.listView);
     }
 
     @Override
@@ -53,12 +65,20 @@ public class ExpenseDiagramActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        //showDiagram();
+    }
+
+    // Нажатие кнопки полной диаграммы расходов
+    public void onBtn_showFullDiagram(View view)
+    {
+        createFullList();
         showDiagram();
     }
 
-    // Нажатие кнопки диаграммы расходов
-    public void onBtn_showDiagram(View view)
+    // Нажатие кнопки сжатой диаграммы расходов
+    public void onBtn_showShortDiagram(View view)
     {
+        createShortList();
         showDiagram();
     }
 
@@ -85,32 +105,135 @@ public class ExpenseDiagramActivity extends AppCompatActivity {
             paint.setStrokeWidth(10);
             Path path = new Path();
 
-            float[] aaa = {1,1,2,3};
-
             final RectF oval = new RectF();
             float center_x, center_y;
             center_x = canvas.getWidth()/2;
             center_y = canvas.getHeight()/2;
-            float radius = 300f;
+            float radius = 400f;
 
             float delta = 0; // Минимальная единица зарисовки
-            for (int i=0; i<4;i++) delta +=aaa[i];
+            for (String state: expenseAboutMap.keySet()) delta += expenseAboutMap.get(state);
             delta = 360/delta;
 
             float last_point = 0; // Конец последнего края отрисовоной части
 
+            int k = 1;
             // Рисуем диаграмму расходов
-            for (int i=0; i<4;i++) {
+            for (String state: expenseAboutMap.keySet()) {
                 oval.set(center_x - radius, center_y - radius, center_x + radius,
                         center_y + radius);
-                paint.setColor(0xFFB9F6CA*(i+1));
-                canvas.drawArc(oval, last_point, aaa[i]*delta, true, paint);
-                last_point += aaa[i]*delta;
+                paint.setColor(0xFFB9F6CA*(k));
+                k+=1;
+                canvas.drawArc(oval, last_point, expenseAboutMap.get(state)*delta, true, paint);
+                last_point += expenseAboutMap.get(state)*delta;
             }
 
             imageView.setImageBitmap(bitmap);
             btn.setText("Диаграмма");
 
         } catch (Exception e) {btn.setText("Жми");}
+    }
+
+    // Заполнения полного списка
+    void createFullList()
+    {
+        expenseAboutMap = new HashMap<>(); // Категории расходов
+
+        for (int i=0; i < checks_array.size(); i++) {
+            if (checks_array.get(i).getExpense_revenue() < 0){
+                try {
+                    expenseAboutMap.put(checks_array.get(i).getName(), expenseAboutMap.get(checks_array.get(i).getName()) - checks_array.get(i).getExpense_revenue());
+                } catch (Exception e) {
+                    expenseAboutMap.put(checks_array.get(i).getName(), -checks_array.get(i).getExpense_revenue());
+                }
+            }
+        }
+
+        // Выводим список расходов по категориям
+        listView.setAdapter(null);
+
+        // Обьявляем массив значений-ключей и заполняем его
+        ArrayList<CategoryExpense> list = new ArrayList<>();
+
+        for (String state : expenseAboutMap.keySet()) {
+            list.add(new CategoryExpense(String.format("%.18s", state),String.format("%.1f", expenseAboutMap.get(state))));
+        }
+
+        CategoryArrayAdapter listAdapter = new CategoryArrayAdapter(this, list);
+        listView.setAdapter(listAdapter);
+    }
+
+    // Заполнения сжатого списка
+    void createShortList()
+    {
+        expenseAboutMap = new HashMap<>(); // Категории расходов
+
+        for (int i=0; i < checks_array.size(); i++) {
+            if (checks_array.get(i).getExpense_revenue() < 0){
+                try {
+                    expenseAboutMap.put(changeCategory(checks_array.get(i).getName()), expenseAboutMap.get(changeCategory(checks_array.get(i).getName())) - checks_array.get(i).getExpense_revenue());
+                } catch (Exception e) {
+                    expenseAboutMap.put(changeCategory(checks_array.get(i).getName()), -checks_array.get(i).getExpense_revenue());
+                }
+            }
+        }
+
+        // Выводим список расходов по категориям
+        listView.setAdapter(null);
+
+        // Обьявляем массив значений-ключей и заполняем его
+        ArrayList<CategoryExpense> list = new ArrayList<>();
+
+        for (String state : expenseAboutMap.keySet()) {
+            list.add(new CategoryExpense(String.format("%.18s", state),String.format("%.1f", expenseAboutMap.get(state))));
+        }
+
+        CategoryArrayAdapter listAdapter = new CategoryArrayAdapter(this, list);
+        listView.setAdapter(listAdapter);
+    }
+
+    // Выбор категории
+    String changeCategory(String name_check)
+    {
+        // Магазины, гипермаргеты
+        String[] Shop_category = {"KARUSEL", "PLOVDIV", "OKEY", "SPAR", "PYATEROCHKA",
+                "MAGNIT", "PEREKRESTOK", "AUCHAN", "PERVAYA POLOSA", "UN.TALLINNSKIY",
+                "OVOSHHI", "BELORUSSKIJ DVORIK"};
+        for (String s: Shop_category) if (name_check.contains(s)) return "Магазины";
+
+        // Рестараны, кафе, фастфуды
+        String[] Food_category = {"BURGERKING", "FUDKORT", "MCDONALDS", "SUSHI", "Sushi", "KFC", "Your Favorite Shaw"};
+        for (String s: Food_category) if (name_check.contains(s)) return "Кафе, рестораны";
+
+        // Аптеки
+        String[] Apteka_category = {"APTEKA", "Apteka", "LEKA-FARM", "SPB ALTERMED"};
+        for (String s: Apteka_category) if (name_check.contains(s)) return "Апетеки";
+
+        // Одежда и обувь
+        String[] Clothes_category = {"OSTIN", "CROPP", "34PLAY"};
+        for (String s: Clothes_category) if (name_check.contains(s)) return "Одежда и обувь";
+
+        // Расходники
+        String[] Ras_category = {"KANTSELYAR", "KOPIRKA"};
+        for (String s: Ras_category) if (name_check.contains(s)) return "Расходники";
+
+        // Хобби
+        String[] Hobby_category = {"BUKVOED", "LEONARDO"};
+        for (String s: Hobby_category) if (name_check.contains(s)) return "Хобби";
+
+        // Интернет покупки
+        String[] Net_Hobby_category = {"VKONTAKTE", "GOOGLE", "VK"};
+        for (String s: Net_Hobby_category) if (name_check.contains(s)) return "Интернет покупки";
+
+        // Бары
+        if (name_check.contains("BAR")) return "Бары";
+
+        // Метро
+        if (name_check.contains("METRO")) return "Метро";
+
+        // BROKER
+        if (name_check.contains("BROKER")) return "Брокер";
+
+        return  name_check;
     }
 }

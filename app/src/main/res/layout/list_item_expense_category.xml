@@ -4,6 +4,7 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/lin"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
@@ -11,16 +12,9 @@
         android:layout_marginLeft="10dp"
         android:background="#FF212121">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="2">
-
             <TextView
                 android:id="@+id/text1"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
@@ -32,20 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#E8EAF6"
-                android:textSize="8sp" />
-
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/text3"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:textColor="#E3F2FD"
-            android:textSize="24sp" />
-
+                android:textSize="24sp" />
     </LinearLayout>
 
 </LinearLayout>

@@ -37,11 +37,7 @@ public class AnalyticActivity extends AppCompatActivity {
 
     int pos=0;
 
-    double[] balance_arr = new double[1000]; // Массив доходов и расходов
-    String[] about_arr = new String[1000]; // Массив описание
-    String[] balance_arr_str = new String[1000]; // Массив строчных доходов и расходов
-    String[] balance_data = new String[1000]; // Массив дат доходов и расходов
-    int balance_i = 0; // Длина массива баланса
+    ArrayList<Check> checks_array =  new ArrayList<>(); // Массив чеков
 
     TextView textView; // Текст для вывода информации
     ListView listView; // Лист для вывода доходов и расходов
@@ -130,50 +126,35 @@ public class AnalyticActivity extends AppCompatActivity {
                 str = Inbox_msg[i].split("Покупка ")[1].split("р")[0];
                 str_about_txt = Inbox_msg[i].split("Покупка ")[1].split("р ")[1].split(" Баланс")[0];
                 try {
-                    balance_arr[balance_i] = -Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i] = str_about_txt;
-                    balance_i += 1;
+                    checks_array.add(new Check(str_about_txt,-Float.parseFloat(str),Inbox_date[i]));
                 } catch (NumberFormatException e) {}
             }
 
             if (Inbox_msg[i].contains("Оплата ")) {
                 str = Inbox_msg[i].split("Оплата ")[1].split("р")[0];
                 try {
-                    balance_arr[balance_i] = -Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i]  = "Оплата в интернете";
-                    balance_i += 1;
+                    checks_array.add(new Check("Оплата в интернете",-Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
             if (Inbox_msg[i].contains("перевод ")) {
                 str = Inbox_msg[i].split("перевод ")[1].split("р")[0];
                 try {
-                    balance_arr[balance_i] = -Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i]  = "Перевод с карты";
-                    balance_i += 1;
+                    checks_array.add(new Check("Перевод с карты",-Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
             if (Inbox_msg[i].contains("Выдача ")) {
                 str = Inbox_msg[i].split("Выдача ")[1].split("р")[0];
                 try {
-                    balance_arr[balance_i] = -Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i] = "Выдача наличных";
-                    balance_i += 1;
+                    checks_array.add(new Check("Выдача наличных",-Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
             if (Inbox_msg[i].contains("мобильный банк за ")) {
                 str = Inbox_msg[i].split("мобильный банк за ")[1].split("р")[0].split(" ")[1];
                 try {
-                    balance_arr[balance_i] = -Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i] = "Мобильный банк";
-                    balance_i += 1;
+                    checks_array.add(new Check("Мобильный банк",-Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
@@ -181,30 +162,21 @@ public class AnalyticActivity extends AppCompatActivity {
             if (Inbox_msg[i].contains("Перевод ")) {
                 str = Inbox_msg[i].split("Перевод ")[1].split("р")[0];
                 try {
-                    balance_arr[balance_i] = Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i]  = "Получен перевод";
-                    balance_i += 1;
+                    checks_array.add(new Check("Получен перевод",Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
             if (Inbox_msg[i].contains("зачисление ")) {
                 str = Inbox_msg[i].split("зачисление ")[1].split("р")[0];
                 try {
-                    balance_arr[balance_i] = Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i]  = "Зачисление";
-                    balance_i += 1;
+                    checks_array.add(new Check("Зачисление",Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
             if (Inbox_msg[i].contains("Зачисление ")) {
                 str = Inbox_msg[i].split("Зачисление ")[1].split("р")[0];
                 try {
-                    balance_arr[balance_i] = Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i] = "Зачисление";
-                    balance_i += 1;
+                    checks_array.add(new Check("Зачисление",Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
@@ -248,7 +220,7 @@ public class AnalyticActivity extends AppCompatActivity {
         }
         else
         {
-            textView.setText("no message from this contact"+phoneNumber);
+            textView.setText("Нет сообщение от "+phoneNumber);
         }
 
         str = "ggg";
@@ -260,32 +232,23 @@ public class AnalyticActivity extends AppCompatActivity {
             // Расходы
             if (Inbox_msg[i].contains("Oplata ")) {
                 str = Inbox_msg[i].split("Oplata ")[1].split(" RUB")[0];
-                str_about_txt = Inbox_msg[i].split("Oplata ")[1].split("RUB;")[1].split(" ")[0];
+                str_about_txt = Inbox_msg[i].split("Oplata ")[1].split("RUB;")[1].split(";")[0];
                 try {
-                    balance_arr[balance_i] = -Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i] = str_about_txt;
-                    balance_i += 1;
+                    checks_array.add(new Check(str_about_txt,-Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
             if (Inbox_msg[i].contains("spisanie ")) {
                 str = Inbox_msg[i].split("spisanie ")[1].split(" RUB")[0];
                 try {
-                    balance_arr[balance_i] = -Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i] = "Перевод";
-                    balance_i += 1;
+                    checks_array.add(new Check("Перевод",-Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
             if (Inbox_msg[i].contains("snyatie ")) {
                 str = Inbox_msg[i].split("snyatie ")[1].split(" RUB")[0];
                 try {
-                    balance_arr[balance_i] = -Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i] = "Выдача наличных";
-                    balance_i += 1;
+                    checks_array.add(new Check("Выдача наличных",-Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
@@ -293,20 +256,14 @@ public class AnalyticActivity extends AppCompatActivity {
             if (Inbox_msg[i].contains("postuplenie zarabotnoy plati ")) {
                 str = Inbox_msg[i].split("postuplenie zarabotnoy plati ")[1].split(" RUB")[0];
                 try {
-                    balance_arr[balance_i] = Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i] = "Зарплата";
-                    balance_i += 1;
+                    checks_array.add(new Check("Зарплата",Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
             if (Inbox_msg[i].contains("postuplenie ")) {
                 str = Inbox_msg[i].split("postuplenie ")[1].split(" RUB")[0];
                 try {
-                    balance_arr[balance_i] = Double.parseDouble(str);
-                    balance_data[balance_i] = Inbox_date[i];
-                    about_arr[balance_i] = "Получен перевод";
-                    balance_i += 1;
+                    checks_array.add(new Check("Получен перевод",Float.parseFloat(str),Inbox_date[i]));
                 } catch(NumberFormatException e){}
             }
 
@@ -319,35 +276,15 @@ public class AnalyticActivity extends AppCompatActivity {
         int sortData = 0;
         long l;
         Date d;
-        double bal_arr = 0;
-        String bal_data = "";
-        String bal_about = "";
-        StringBuilder sss;
 
-        for (int j=0; j < balance_i; j++) {
-            sss = new StringBuilder();
-            sss.append(balance_data[j].charAt(6));
-            sss.append(balance_data[j].charAt(7));
-            sss.append(balance_data[j].charAt(8));
-            sss.append(balance_data[j].charAt(9));
-            sss.append(balance_data[j].charAt(3));
-            sss.append(balance_data[j].charAt(4));
-            sss.append(balance_data[j].charAt(0));
-            sss.append(balance_data[j].charAt(1));
-            maxData = Integer.parseInt(sss.toString());
+        Check exchange_check = new Check(); // Чек для алгоритма обмена
+
+        for (int j=0; j < checks_array.size(); j++) {
+            maxData = Integer.parseInt(checks_array.get(j).getStringDate());
             max_kData = j;
 
-            for (int k = j; k < balance_i; k++) {
-                sss = new StringBuilder();
-                sss.append(balance_data[k].charAt(6));
-                sss.append(balance_data[k].charAt(7));
-                sss.append(balance_data[k].charAt(8));
-                sss.append(balance_data[k].charAt(9));
-                sss.append(balance_data[k].charAt(3));
-                sss.append(balance_data[k].charAt(4));
-                sss.append(balance_data[k].charAt(0));
-                sss.append(balance_data[k].charAt(1));
-                sortData = Integer.parseInt(sss.toString());
+            for (int k = j; k < checks_array.size(); k++) {
+                sortData = Integer.parseInt(checks_array.get(k).getStringDate());
 
                 if (sortData>maxData)
                 {
@@ -356,27 +293,18 @@ public class AnalyticActivity extends AppCompatActivity {
                 }
             }
 
-            bal_data = balance_data[j];
-            balance_data[j] = balance_data[max_kData];
-            balance_data[max_kData] = bal_data;
-
-            bal_arr = balance_arr[j];
-            balance_arr[j] = balance_arr[max_kData];
-            balance_arr[max_kData] = bal_arr;
-
-            bal_about = about_arr[j];
-            about_arr[j] = about_arr[max_kData];
-            about_arr[max_kData] = bal_about;
+            exchange_check.setCheck(checks_array.get(j));
+            checks_array.get(j).setCheck(checks_array.get(max_kData));
+            checks_array.get(max_kData).setCheck(exchange_check);
         }
 
         // Подсчитываем баланс ////////////////////////////////////////////////////////////////////
         double balance = 0;
-        for (int j=0; j < balance_i; j++) {
-            balance = balance + balance_arr[j];
-            balance_arr_str[j] = String.valueOf(balance_arr[j]);
+        for (int j=0; j < checks_array.size(); j++) {
+            balance = balance + checks_array.get(j).getExpense_revenue();
         }
 
-        textView.setText("Баланс: ..." );//+ String.format("%.2f", balance));
+        textView.setText("Список" );//+ String.format("%.2f", balance));
 
         // Выводим список доходов и расходов
         // используем адаптер данных
@@ -387,11 +315,11 @@ public class AnalyticActivity extends AppCompatActivity {
         ArrayList<HashMap<String, String>> list = new ArrayList<>();
         HashMap<String, String> map;
 
-        for (int j=0; j < balance_i; j++) {
+        for (int j=0; j < checks_array.size(); j++) {
             map = new HashMap<>();
-            map.put("text1",String.valueOf(balance_arr[j]));
-            map.put("text2",balance_data[j]);
-            map.put("text3",about_arr[j]);
+            map.put("text1",checks_array.get(j).getStringExpense_revenue());
+            map.put("text2",checks_array.get(j).getDate());
+            map.put("text3",checks_array.get(j).getName());
             list.add(map);
         }
 
@@ -405,11 +333,20 @@ public class AnalyticActivity extends AppCompatActivity {
     // Нажатие на кнопку анализа
     public void onStatButtonClick(View view)
     {
+        float[] check_ex_rev = new float[checks_array.size()];
+        String[] check_date = new String[checks_array.size()];
+        String[] check_about = new String[checks_array.size()];
+
+        for (int j=0; j < checks_array.size(); j++) {
+            check_ex_rev[j] = checks_array.get(j).getExpense_revenue();
+            check_date[j] = checks_array.get(j).getDate();
+            check_about[j] = checks_array.get(j).getName();
+        }
+
         Intent i1 = new Intent(this,StatisticActivity.class);
-        i1.putExtra("balance_arr", balance_arr);
-        i1.putExtra("balance_data", balance_data);
-        i1.putExtra("about_arr", about_arr);
-        i1.putExtra("balance_i", balance_i);
+        i1.putExtra("check_ex_rev", check_ex_rev);
+        i1.putExtra("check_date", check_date);
+        i1.putExtra("check_about", check_about);
         startActivity(i1);
     }
 }

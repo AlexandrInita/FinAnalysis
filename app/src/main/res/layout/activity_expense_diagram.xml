@@ -22,25 +22,46 @@
             android:layout_marginBottom="10dp"
             android:background="@drawable/graphview" />
 
-        <Button
-            android:id="@+id/button2"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/cool_button"
-            android:onClick="onBtn_showDiagram"
-            android:text="Диаграмма"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"/>
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="189dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/cool_button"
+                android:onClick="onBtn_showFullDiagram"
+                android:text="Полная"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/cool_button"
+                android:onClick="onBtn_showShortDiagram"
+                android:text="Сжатая"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+        </LinearLayout>
 
         <ListView
+            android:id="@+id/listView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:color="#FF212121"
+            android:layout_height="241dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp"
+            android:color="#FF212121" />
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
