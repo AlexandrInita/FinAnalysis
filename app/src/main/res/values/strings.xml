@@ -2,4 +2,11 @@
     <string name="app_name">FinAnalysis</string>
     <string name="fin">Финансы</string>
     <string name="analitic">Аналитика</string>
+    <string name="add_check">Добавление</string>
+    <string name="title_top">Первый фрагмент</string>
+
+    <string-array name="menu_array">
+        <item>Экран 1</item>
+        <item>Очисть базу данных</item>
+    </string-array>
 </resources>

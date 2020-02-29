@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +30,6 @@ public class ExpenseDiagramActivity extends AppCompatActivity {
 
     ImageView imageView; // Диаграмма
     ListView listView; // Список расходов
-    Button btn;
 
     ArrayList<Check> checks_array = new ArrayList<>(); // Чеки
 
@@ -53,7 +53,6 @@ public class ExpenseDiagramActivity extends AppCompatActivity {
 
         // Инициализация
         imageView = findViewById(R.id.imageView);
-        btn = findViewById(R.id.button2);
         listView = findViewById(R.id.listView);
     }
 
@@ -129,9 +128,10 @@ public class ExpenseDiagramActivity extends AppCompatActivity {
             }
 
             imageView.setImageBitmap(bitmap);
-            btn.setText("Диаграмма");
-
-        } catch (Exception e) {btn.setText("Жми");}
+        } catch (Exception e) {
+            Toast toast = Toast.makeText(this, "Ошибка", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     // Заполнения полного списка
@@ -207,11 +207,11 @@ public class ExpenseDiagramActivity extends AppCompatActivity {
 
         // Аптеки
         String[] Apteka_category = {"APTEKA", "Apteka", "LEKA-FARM", "SPB ALTERMED"};
-        for (String s: Apteka_category) if (name_check.contains(s)) return "Апетеки";
+        for (String s: Apteka_category) if (name_check.contains(s)) return "Аптеки";
 
         // Одежда и обувь
         String[] Clothes_category = {"OSTIN", "CROPP", "34PLAY"};
-        for (String s: Clothes_category) if (name_check.contains(s)) return "Одежда и обувь";
+        for (String s: Clothes_category) if (name_check.contains(s)) return "Гардероб";
 
         // Расходники
         String[] Ras_category = {"KANTSELYAR", "KOPIRKA"};

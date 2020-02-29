@@ -12,33 +12,36 @@
         android:roundIcon="@mipmap/ic_launcher_face_round"
         android:supportsRtl="true"
         android:theme="@style/CoolTheme">
-
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
             android:configChanges="orientation"
+            android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".AnalyticActivity"
-            android:label="@string/fin"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:label="@string/fin"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".StatisticActivity"
-            android:label="@string/analitic"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:label="@string/analitic"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ExpenseDiagramActivity"
-            android:label="@string/analitic"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"/>
+            android:label="@string/analitic"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AddCheckActivity"
+            android:configChanges="orientation"
+            android:label="@string/add_check"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
